@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IUT Class Routine</title>
+  <link rel="stylesheet" href="style.css"/>
+
+  <button id="toggle-theme" onclick="toggleTheme()">🌞 / 🌙</button>
+
+</head>
+<body>
+  <div class="container">
+    <h1>IUT Class Routine</h1>
+
+    <div class="routine-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+          </tr>
+        </thead>
+        <tbody id="routine-table-body">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="login-section">
+      <h2>Admin Login</h2>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
