@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IUT Class Routine</title>
   <link rel="stylesheet" href="style.css" />
-
   <button id="toggle-theme" onclick="toggleTheme()">🌞 / 🌙</button>
 </head>
 
@@ -16,23 +14,28 @@
 
     <div class="routine-container">
       <table>
-        <thead>
-        </thead>
+        <thead></thead>
         <tbody id="routine-table-body">
           <!-- Populated by JS -->
         </tbody>
       </table>
     </div>
 
-    <div class="login-section">
+    <div class="login-section" id="login-section">
       <h2>Admin Login</h2>
       <input type="text" id="username" placeholder="Username" />
       <input type="password" id="password" placeholder="Password" />
       <button onclick="login()">Login</button>
     </div>
+
+    <div class="admin-panel" id="admin-panel" style="display: none;">
+      <h2>Admin Panel – Lab Group Assignment</h2>
+      <div id="labs" class="labs-section"></div>
+      <button id="assign-button" onclick="assignGroups()">Assign Groups</button>
+      <button id="signout-button" onclick="logout()">Sign Out</button>
+    </div>
   </div>
 
   <script src="script.js"></script>
 </body>
-
 </html>

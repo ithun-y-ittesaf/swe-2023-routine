@@ -8,7 +8,7 @@ const routineData = [
         course: "Math 4241 (100 mins)", 
         teacher: "AKA (NSc)", 
         room: "R109 (ABS)",
-        colspan: 2 // This will span two time slots
+        colspan: 2
       },
       { time: "13:00 – 14:30", course: "Break" },
       { time: "14:30 – 15:45", course: "CSE 4206", teacher: "THS", room: "L-1" }
@@ -24,7 +24,7 @@ const routineData = [
         course: "SWE 4202", 
         teacher: "JN / MNR", 
         room: "L-1",
-        colspan: 2 // Spans two periods
+        colspan: 2
       },
       { time: "13:00 – 14:30", course: "Break" },
       { time: "14:30 – 15:45", course: "HUM 4247", teacher: "TAH (BTM)", room: "R105 (ABS)" }
@@ -35,17 +35,17 @@ const routineData = [
     entries: [
       { 
         time: "08:00 – 10:30", 
-        course: "SWE 4202", 
+        course: "SWE 4204", 
         teacher: "JN / MNR", 
         room: "L-1",
-        colspan: 2 // Spans two periods
+        colspan: 2
       },
       { 
         time: "10:30 – 13:00", 
         course: "HUM 4242 (100 mins)", 
         teacher: "ARMK", 
         room: "R-304",
-        colspan: 2 // Spans two periods
+        colspan: 2
       },
       { time: "13:00 – 14:30", course: "Break" }
     ]
@@ -60,7 +60,7 @@ const routineData = [
         course: "Math 4241 (100 mins)", 
         teacher: "AKA (NSc)", 
         room: "R109 (ABS)",
-        colspan: 2 // Spans two periods
+        colspan: 2
       },
       { time: "13:00 – 14:30", course: "Break" },
       { time: "14:30 – 15:45", course: "SWE 4201", teacher: "JN", room: "R105 (ABS)" }
@@ -78,19 +78,16 @@ const routineData = [
   }
 ];
 
-// Check if course is lab
 function isLab(course) {
-  return /\d+[02468]$/.test(course.split(' ')[1]) && !course.includes("HUM");
+  return course === "SWE 4202" || course === "SWE 4204" || course === "CSE 4206";
 }
 
-// Renders table with days in first column and times as headers
 function showRoutine() {
   const tbody = document.getElementById("routine-table-body");
   if (!tbody) return;
 
   tbody.innerHTML = "";
 
-  // Time slots
   const times = [
     "08:00 – 09:15",
     "09:15 – 10:30",
@@ -122,7 +119,7 @@ function showRoutine() {
     dayTd.textContent = dayData.day;
     tr.appendChild(dayTd);
 
-    let skipCells = 0; // To handle colspan
+    let skipCells = 0;
 
     times.forEach((time, timeIndex) => {
       if (skipCells > 0) {
@@ -139,13 +136,12 @@ function showRoutine() {
         if (entry.room) courseDisplay += `Room: ${entry.room}`;
 
         if (isLab(entry.course)) {
-          const group = localStorage.getItem(`${entry.course.split(' ')[0]}_group`) || "Not Assigned";
+          const group = localStorage.getItem(`${entry.course}_group`) || "Not Assigned";
           courseDisplay += `<br><em>Group: ${group}</em>`;
         }
 
         td.innerHTML = courseDisplay;
         
-        // Apply colspan if specified
         if (entry.colspan) {
           td.colSpan = entry.colspan;
           skipCells = entry.colspan - 1;
@@ -158,48 +154,39 @@ function showRoutine() {
   });
 }
 
-showRoutine();
-
-
 function login() {
   const user = document.getElementById('username').value;
   const pass = document.getElementById('password').value;
   if (user === 'admin' && pass === 'admin') {
     localStorage.setItem('loggedIn', 'true');
-    window.location.href = 'admin.html';
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    renderAdminPanel();
   } else {
     alert('Invalid credentials');
   }
 }
 
-// Admin Page Logic
 function renderAdminPanel() {
-  if (!window.location.pathname.includes("admin.html")) return;
-  if (localStorage.getItem("loggedIn") !== "true") {
-    window.location.href = "index.html";
-    return;
-  }
+  if (localStorage.getItem("loggedIn") !== "true") return;
 
   const labsContainer = document.getElementById("labs");
-  const labCourses = new Set();
+  labsContainer.innerHTML = "";
 
-  routineData.forEach(row => {
-    row.entries.forEach(entry => {
-      if (entry.course && isLab(entry.course)) {
-        labCourses.add(entry.course);
-      }
-    });
-  });
+  const labCourses = ["SWE 4202", "SWE 4204", "CSE 4206"];
 
   labCourses.forEach(course => {
     const wrapper = document.createElement("div");
-    wrapper.style.margin = "10px 0";
+    wrapper.style.margin = "15px 0";
 
     const label = document.createElement("label");
     label.textContent = `${course} Group: `;
+    label.style.marginRight = "10px";
 
     const select = document.createElement("select");
-    ["Odd", "Even"].forEach(group => {
+    select.id = `${course.replace(/\s+/g, '-')}-select`;
+    
+    ["Not Assigned", "Odd", "Even"].forEach(group => {
       const opt = document.createElement("option");
       opt.value = group;
       opt.textContent = group;
@@ -209,26 +196,28 @@ function renderAdminPanel() {
       select.appendChild(opt);
     });
 
-    select.onchange = () => {
-      localStorage.setItem(`${course}_group`, select.value);
-    };
-
     wrapper.appendChild(label);
     wrapper.appendChild(select);
     labsContainer.appendChild(wrapper);
   });
 }
 
-function logout() {
-  localStorage.removeItem("loggedIn");
-  window.location.href = "index.html";
+function assignGroups() {
+  const courses = ["SWE 4202", "SWE 4204", "CSE 4206"];
+  courses.forEach(course => {
+    const select = document.getElementById(`${course.replace(/\s+/g, '-')}-select`);
+    localStorage.setItem(`${course}_group`, select.value);
+  });
+  showRoutine();
+  alert('Lab groups assigned successfully!');
 }
 
-showRoutine();
-renderAdminPanel();
+function logout() {
+  localStorage.removeItem("loggedIn");
+  document.getElementById('login-section').style.display = 'block';
+  document.getElementById('admin-panel').style.display = 'none';
+}
 
-
-// Theme toggle
 function toggleTheme() {
   document.body.classList.toggle("dark");
   const isDark = document.body.classList.contains("dark");
@@ -242,4 +231,14 @@ function loadTheme() {
   }
 }
 
+// Initialize
+if (localStorage.getItem("loggedIn") === "true") {
+  document.getElementById('login-section').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  renderAdminPanel();
+} else {
+  document.getElementById('admin-panel').style.display = 'none';
+}
+
 loadTheme();
+showRoutine();
